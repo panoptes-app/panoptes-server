@@ -1,5 +1,6 @@
 package org.panoptes.server.core.http
 
+import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.json.JsonObject
 import org.panoptes.server.core.Constants
@@ -12,7 +13,7 @@ class MockUserCreatorVerticle : AbstractVerticle() {
             if (msg.body().getString("login") == "toto" && msg.body().getString("password") == "tutu") {
                 msg.reply("toto")
             } else {
-                msg.reply(null)
+                msg.fail(HttpResponseStatus.CONFLICT.code(),"user already exists")
             }
          })
     }

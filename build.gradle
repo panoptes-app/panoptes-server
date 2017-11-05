@@ -55,6 +55,7 @@ dependencies {
 
     testCompile "io.vertx:vertx-unit:$version"
     testCompile "io.vertx:vertx-web-client:$version"
+    testCompile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0"
     testCompile "junit:junit:4.12"
 
 }

@@ -3,14 +3,11 @@ package org.panoptes.server.core
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.Handler
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.mqtt.MqttServerOptions
-import io.vertx.mqtt.MqttClient
-import io.vertx.mqtt.MqttClientOptions
 import io.vertx.mqtt.MqttServer
 
 class MainVerticle : AbstractVerticle() {

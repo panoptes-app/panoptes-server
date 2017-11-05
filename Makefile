@@ -13,13 +13,15 @@ reset-db:
 
 run: reset-db
 	@echo "let's have fun"
-	@./gradlew run -conf src/main/conf/my-application-conf.json
+	@./gradlew build
+	@java -jar build/libs/panoptes-server-0.0.1-fatJar.jar -conf src/main/conf/conf.json
+
 
 build:
 	@./gradlew clean shadowJar
 
 deploy-rasp: build
-	@scp build/libs/panoptes-3.5.0-fatJar.jar pi@$(RASP_IP):./
+	@scp build/libs/panoptes-0.0.1-fatJar.jar pi@$(RASP_IP):./
 
 test:
 	@echo "it's time to start db for test"

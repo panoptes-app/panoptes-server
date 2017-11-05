@@ -3,6 +3,7 @@ package org.panoptes.server.core
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.DeploymentOptions
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
@@ -14,12 +15,23 @@ class MainVerticle : AbstractVerticle() {
 
     @Throws(Exception::class)
     override fun start() {
-        val httpPort = config().getInteger("http.port", 8080)!!
-        val mqttPort = config().getInteger("mqtt.port", 1883)!!
+        startMongoVerticle()
 
-        startHttpServer(httpPort)
-        startMqttBroker(mqttPort)
 
+    }
+
+    private fun startMongoVerticle() {
+        val options = DeploymentOptions().setConfig(config())
+        vertx.deployVerticle(MongoVerticle::class.java, options, { verticleDeployment ->
+            if (verticleDeployment.succeeded()) {
+                val httpPort = config().getInteger("http.port", 8080)!!
+                val mqttPort = config().getInteger("mqtt.port", 1883)!!
+                startHttpServer(httpPort)
+                startMqttBroker(mqttPort)
+            } else {
+                println("could not start mongo verticle because : ${verticleDeployment.cause()}")
+            }
+        })
     }
 
     private fun startMqttBroker(mqttPort: Int) {
@@ -53,6 +65,9 @@ class MainVerticle : AbstractVerticle() {
                 endpoint.reject(MqttConnectReturnCode.CONNECTION_REFUSED_NOT_AUTHORIZED)
             }
 
+            endpoint.publishHandler({ message ->
+                println("msg published on topic ${message.topicName()} : ${String(message.payload().getBytes())}")
+            })
 
         }.listen { ar ->
             if (ar.succeeded()) {
@@ -61,11 +76,7 @@ class MainVerticle : AbstractVerticle() {
                 println("Error on starting the server")
                 ar.cause().printStackTrace()
             }
-        }.endpointHandler({ handler ->
-            handler.publishHandler({ message ->
-                println("msg published on topic ${message.topicName()} : ${String(message.payload().getBytes())}")
-            })
-        })
+        }
     }
 
     private fun startHttpServer(httpPort: Int) {

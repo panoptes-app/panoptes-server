@@ -1,3 +1,5 @@
 {
-    "http.port": 8080
+    "http.port": 8080,
+    "mongo_db_name": "panoptes",
+    "mongo_connection_string": "mongodb://panoptes:panoptes@localhost:27017/panoptes"
 }

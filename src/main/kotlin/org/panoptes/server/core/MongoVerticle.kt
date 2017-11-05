@@ -20,12 +20,14 @@ class MongoVerticle : AbstractVerticle() {
         vertx.eventBus().consumer<JsonObject>(Constants.TOPIC_AUTH_USER, { msg ->
             val userToFind = JsonObject().put("email",msg.body().getString("login"))
             client.find(Constants.MONGO_COLLECTION_USERS, userToFind, { userResearch ->
-                if (userResearch.succeeded()){
+                if (userResearch.succeeded() && !userResearch.result().isEmpty()){
                     if (userResearch.result().first().getString("password") == encodePassword(msg.body().getString("password"))){
                         msg.reply(true)
                     } else {
                         msg.fail(HttpResponseStatus.FORBIDDEN.code(), "user not found")
                     }
+                } else {
+                    println("could not find ${msg.body().getString("login")}, cause: ${userResearch.cause()}")
                 }
             })
         })
@@ -53,7 +55,7 @@ class MongoVerticle : AbstractVerticle() {
     }
 
     private fun initDb() {
-
+        println("initialize db")
         client.getCollections { res ->
             if ( res.succeeded() && !(res.result().stream().filter({ t -> t.equals(Constants.MONGO_COLLECTION_USERS) }).findFirst().isPresent)){
                 //create collection and populate with technical user
@@ -65,6 +67,7 @@ class MongoVerticle : AbstractVerticle() {
     }
 
     private fun createCollections() {
+        println("create users collection")
         client.createCollection(Constants.MONGO_COLLECTION_USERS, { creation ->
             if (creation.succeeded()) {
                 createPanoptesUser()
@@ -76,13 +79,16 @@ class MongoVerticle : AbstractVerticle() {
     }
 
     private fun createPanoptesUser() {
+        println("create default user")
         val panoptesUser = JsonObject().put("email", "panoptes").put("password", "panoptes")
         client.find(Constants.MONGO_COLLECTION_USERS,panoptesUser,{panoptesUserFind ->
-            if (panoptesUserFind.succeeded()){
+            if (panoptesUserFind.succeeded() && !panoptesUserFind.result().isEmpty()){
+                println("default user already exist")
                 suscribeCommand()
             } else {
                 client.save(Constants.MONGO_COLLECTION_USERS, panoptesUser, { userCreation ->
                     if (userCreation.succeeded()){
+                        println("default user created")
                         suscribeCommand()
                     } else {
                         println("cannot create panoptes user  so kill ${this.javaClass.name} is dieing")

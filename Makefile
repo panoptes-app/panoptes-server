@@ -20,8 +20,6 @@ build:
 
 deploy-rasp: build
 	@scp build/libs/panoptes-3.5.0-fatJar.jar pi@$(RASP_IP):./
-	@GOARCH=arm GOARM=6 go build -o "build/panoptes" main.go
-	@scp ./build/panoptes pi@$(RASP_IP):./panoptes
 
 test:
 	@echo "it's time to start db for test"

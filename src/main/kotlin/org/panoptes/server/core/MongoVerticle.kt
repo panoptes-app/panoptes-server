@@ -4,18 +4,9 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.mongo.MongoClient
-import java.util.function.Predicate
 
 class MongoVerticle : AbstractVerticle() {
 
-
-//DeploymentOptions options = new DeploymentOptions()
-//    .setConfig(new JsonObject()
-//    .put("http.port", port)
-//    .put("db_name", "whiskies-test")
-//    .put("connection_string",
-//    "mongodb://localhost:" + MONGO_PORT)
-//    );
     lateinit var client: MongoClient
 
     @Throws(Exception::class)
